@@ -1,0 +1,29 @@
+# 业务数据：安装目录运行时生成，含真实质量文控数据，禁止入库
+data.sqlite
+
+# WorkBuddy 内部数据（记忆 / 日志 / 任务等）
+.workbuddy/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# PyInstaller 构建中间目录（仅最终 exe 入库，其余可重建）
+build/FormControl/
+
+# 临时文件 / Inno Setup 残留
+*.tmp
+
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+
+# WorkBuddy 预览/历史遗留脚本（非运行必需，主 HTML 已内联全部逻辑）
+.page-script.js
+
+# WorkBuddy 产物文件
+overview.md
+
+# 用户参考数据 / 导入样例（非源码、非构建产物）
+海华公司文件编号原则汇总表3.xlsx
+表格格式_按分类拆分 (2).xlsx
