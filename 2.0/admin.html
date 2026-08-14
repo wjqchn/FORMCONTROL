@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>质量文控平台 · 管理端</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f7fa;--panel:#ffffff;--panel2:#f1f5f8;--line:#dfe6eb;--text:#3a4a59;--muted:#62788a;--brand:#6d83ed;--brand2:#1aa891;--danger:#e2677a;--warn:#d99b2b;--shadow:0 20px 60px rgba(53,87,105,.12)}
+body{margin:0;background:radial-gradient(1200px 620px at 100% 0,rgba(109,131,237,.07),transparent 60%),var(--bg);color:var(--text);font-family:Rockwell,"Microsoft YaHei","PingFang SC",sans-serif;min-height:100vh;padding:24px}
+
+.app{max-width:1100px;margin:auto}
+
+/* Hero */
+.hero{position:relative;min-height:148px;display:flex;align-items:center;justify-content:space-between;gap:25px;margin-bottom:22px;padding:25px 32px;overflow:hidden;border:1px solid rgba(146,184,206,.55);border-radius:15px;background:radial-gradient(560px 300px at 92% -34%,rgba(255,176,102,.26),transparent 60%),radial-gradient(640px 340px at 4% 142%,rgba(92,148,255,.24),transparent 60%),radial-gradient(470px 270px at 66% 166%,rgba(255,119,162,.20),transparent 62%),radial-gradient(380px 230px at 26% -44%,rgba(90,222,198,.24),transparent 60%),linear-gradient(112deg,#d6f4ec 0%,#e3efff 26%,#ece6ff 50%,#ffe7f0 74%,#fff1d6 100%);box-shadow:0 18px 44px rgba(53,87,105,.16)}
+.hero:before{content:"";position:absolute;right:-82px;top:-145px;width:390px;height:390px;border:1px solid #7fd6c7;border-radius:50%;opacity:.62;background:radial-gradient(circle at 50% 50%,rgba(127,214,199,.16),transparent 70%);pointer-events:none}
+.hero:after{content:"";position:absolute;right:88px;bottom:-128px;width:260px;height:260px;border:1px solid #e0a9d8;border-radius:50%;opacity:.7;background:radial-gradient(circle at 50% 50%,rgba(224,169,216,.18),transparent 70%);pointer-events:none}
+.hero-brand{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.hero-brand-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#118f7d 0%,#3f7bd6 55%,#7b5ce0 100%);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;box-shadow:0 4px 12px rgba(63,123,214,.25)}
+.hero-brand h1{font-size:20px;font-weight:700;color:#1c3447}
+.hero-brand p{font-size:12px;color:#5a7a8a;margin-top:2px}
+.hero-actions{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+.hero-actions a,.hero-actions button{font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;text-decoration:none;padding:0 16px;height:36px;border-radius:9px;display:flex;align-items:center;gap:6px;transition:transform .15s}
+.hero-actions a:active,.hero-actions button:active{transform:scale(.97)}
+.hero-link{background:rgba(255,255,255,.6);color:#3b5364;border:1px solid rgba(146,184,206,.4)}
+.hero-logout{background:none;color:#e2677a}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;margin-bottom:18px}
+.tab{padding:10px 22px;border-radius:9px 9px 0 0;font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--line);border-bottom:none;background:var(--panel2);color:var(--muted);transition:background .15s,color .15s}
+.tab.active{background:linear-gradient(135deg,#6d83ed,#5368dc);color:#fff;border-color:transparent}
+
+/* Panels */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:0 12px 12px 12px;padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.panel-head h2{font-size:16px;font-weight:700;color:var(--text)}
+.btn-add{height:34px;padding:0 16px;border:none;border-radius:9px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;color:#fff;background:linear-gradient(135deg,#6d83ed,#5368dc);box-shadow:0 3px 10px rgba(109,131,237,.25)}
+.btn-add:active{transform:scale(.97)}
+
+/* Table */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 14px;background:var(--panel2);color:var(--muted);font-weight:600;border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--line);color:var(--text)}
+tr:hover td{background:var(--panel2)}
+td.actions{white-space:nowrap}
+.action-btn{border:none;background:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;padding:4px 10px;border-radius:6px;margin-right:4px}
+.action-btn:disabled{opacity:.4;cursor:not-allowed}
+.action-edit{color:#5b54d6;background:rgba(109,131,237,.1)}
+.action-edit:hover{background:rgba(109,131,237,.2)}
+.action-del{color:#d4526a;background:rgba(226,103,122,.1)}
+.action-del:hover{background:rgba(226,103,122,.2)}
+.action-deactivate{color:#c98a2b;background:rgba(201,138,43,.1)}
+.action-deactivate:hover{background:rgba(201,138,43,.2)}
+.action-activate{color:#1aa891;background:rgba(26,168,145,.1)}
+.action-activate:hover{background:rgba(26,168,145,.2)}
+.perm-inactive{background:#9aa7b2;color:#fff}
+
+/* Permission badges */
+.perm-badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;margin-right:4px}
+.perm-import{background:rgba(13,148,136,.12);color:#0d9488}
+.perm-entry{background:rgba(109,131,237,.12);color:#5b54d6}
+.perm-edit{background:rgba(217,155,43,.12);color:#b07d12}
+.perm-export{background:rgba(157,78,221,.12);color:#9d4edd}
+.perm-admin{background:rgba(226,103,122,.12);color:#d4526a}
+.perm-backup-settings{background:rgba(37,99,235,.12);color:#2563eb}
+.perm-backup-query{background:rgba(8,145,178,.12);color:#0891b2}
+
+/* Modal */
+.modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(40,55,75,.45);align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.modal-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(53,87,105,.18)}
+.modal-head{padding:20px 24px 0;font-size:16px;font-weight:700;color:var(--text)}
+.modal-body{padding:18px 24px}
+.modal-foot{padding:0 24px 20px;display:flex;justify-content:center;gap:12px}
+.modal-btn{height:38px;min-width:120px;flex:1;border:none;border-radius:10px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:transform .15s}
+.modal-btn:active{transform:scale(.97)}
+.modal-btn.primary{background:linear-gradient(135deg,#6d83ed,#5368dc);color:#fff}
+.modal-btn.secondary{background:var(--panel2);color:var(--muted);border:1.5px solid var(--line)}
+.modal-btn.danger{background:linear-gradient(135deg,#e2677a,#d4526a);color:#fff}
+
+/* Form */
+.form-field{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.form-input{width:100%;height:40px;padding:0 12px;border:1.5px solid var(--line);border-radius:9px;font-size:14px;font-family:inherit;color:var(--text);background:var(--panel2)}
+.form-input:focus{outline:none;border-color:#6d83ed;box-shadow:0 0 0 3px rgba(109,131,237,.18)}
+.form-select{width:100%;height:40px;padding:0 12px;border:1.5px solid var(--line);border-radius:9px;font-size:14px;font-family:inherit;color:var(--text);background:var(--panel2);cursor:pointer}
+.form-hint{font-size:12px;color:var(--muted);margin-top:4px}
+.sys-note{font-size:12px;color:#d4526a;margin-top:4px}
+.perm-checks{display:flex;flex-wrap:wrap;gap:10px}
+.perm-check{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--line);border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);transition:border-color .15s,background .15s}
+.perm-check:hover{border-color:#6d83ed}
+.perm-check input{width:16px;height:16px;accent-color:#6d83ed}
+.perm-check.checked{background:rgba(109,131,237,.08);border-color:#6d83ed}
+.admin-check{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 14px;border-radius:9px;background:rgba(226,103,122,.08);border:1px solid rgba(226,103,122,.2);font-size:13px;font-weight:600;color:var(--text);cursor:pointer}
+.admin-check input{width:16px;height:16px;accent-color:#e2677a}
+
+/* Notice */
+.notice{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;padding:10px 24px;border-radius:9px;font-size:13px;font-weight:600;color:#fff;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+.notice.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.notice.ok{background:linear-gradient(135deg,#2bb6a3,#1aa891)}
+.notice.error{background:linear-gradient(135deg,#e2677a,#d4526a)}
+
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-brand">
+    <div class="hero-brand-mark">Q</div>
+    <div>
+      <h1>系统管理端</h1>
+      <p>用户 · 角色 · 权限</p>
+    </div>
+  </div>
+  <div class="hero-actions">
+    <a class="hero-link" href="/表格分类汇总.html">返回主页</a>
+    <button class="hero-logout" id="logoutBtn">退出登录</button>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" data-tab="users">用户管理</div>
+  <div class="tab" data-tab="roles">角色管理</div>
+  <div class="tab" data-tab="auth" id="authTab" style="display:none">账户备份</div>
+</div>
+
+<!-- Users Panel -->
+<div class="panel" id="usersPanel">
+  <div class="panel-head">
+    <h2>用户列表</h2>
+    <button class="btn-add" id="addUserBtn">+ 新增用户</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>用户名</th><th>角色</th><th>邮箱</th><th>部门</th><th>操作</th></tr></thead>
+      <tbody id="usersBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Roles Panel -->
+<div class="panel" id="rolesPanel" style="display:none">
+  <div class="panel-head">
+    <h2>角色列表</h2>
+    <button class="btn-add" id="addRoleBtn">+ 新增角色</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>角色名称</th><th>权限</th><th>操作</th></tr></thead>
+      <tbody id="rolesBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Account Backup Panel -->
+<div class="panel" id="authBackupPanel" style="display:none">
+  <div class="panel-head">
+    <h2>账户数据库备份</h2>
+    <button class="btn-add" id="authBackupBtn">立即备份</button>
+  </div>
+  <div class="form-hint" style="margin-bottom:14px">账户与权限保存在独立数据库（auth.sqlite）。此处备份仅用于账户库本身损坏或误删时的救助，<b>不参与业务数据还原</b>，因此不会把已删除的账号复活。仅默认管理员账户可操作。</div>
+  <div id="authStatus" class="form-hint" style="margin-bottom:14px"></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>创建时间</th><th>来源</th><th>用户数</th><th>角色数</th><th>大小</th><th>操作</th></tr></thead>
+      <tbody id="authBackupsBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Auth Restore Modal -->
+<div class="modal" id="authRestoreModal">
+  <div class="modal-box">
+    <div class="modal-head">还原账户数据库</div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text);line-height:1.7">确定要用该快照覆盖当前账户数据库吗？<br>还原后<b>所有在线用户将被强制退出并重新登录</b>。此操作只影响账号与角色，不会改动任何业务数据。</p>
+      <div class="sys-note" id="authRestoreTarget"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-btn secondary" id="authRestoreCancelBtn">取消</button>
+      <button class="modal-btn danger" id="authRestoreConfirmBtn">确认还原</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- User Modal -->
+<div class="modal" id="userModal">
+  <div class="modal-box">
+    <div class="modal-head" id="userModalTitle">新增用户</div>
+    <div class="modal-body">
+      <input type="hidden" id="userEditId">
+      <div class="form-field"><label class="form-label">用户名</label><input class="form-input" type="text" id="userUsername"></div>
+      <div class="form-field"><label class="form-label">密码</label><input class="form-input" type="password" id="userPassword" placeholder="编辑时留空表示不修改"><div class="form-hint" id="passwordHint"></div></div>
+      <div class="form-field"><label class="form-label">角色</label><select class="form-select" id="userRole"></select><div class="sys-note" id="userRoleNote" style="display:none">系统保护：默认管理员账户的角色不可修改</div></div>
+      <div class="form-field"><label class="form-label">邮箱</label><input class="form-input" type="email" id="userEmail"></div>
+      <div class="form-field"><label class="form-label">部门</label><input class="form-input" type="text" id="userDepartment"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-btn secondary" id="userCancelBtn">取消</button>
+      <button class="modal-btn primary" id="userSaveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Role Modal -->
+<div class="modal" id="roleModal">
+  <div class="modal-box">
+    <div class="modal-head" id="roleModalTitle">新增角色</div>
+    <div class="modal-body">
+      <input type="hidden" id="roleEditId">
+      <div class="form-field"><label class="form-label">角色名称</label><input class="form-input" type="text" id="roleName"></div>
+      <div class="form-field"><label class="form-label">权限配置</label>
+        <div class="perm-checks" id="permChecks"></div>
+      </div>
+      <label class="admin-check"><input type="checkbox" id="roleIsAdmin"> <span class="perm-badge perm-admin">管理员</span> 该角色可访问管理端页面</label>
+      <div class="sys-note" id="roleAdminNote" style="display:none">系统保护：默认管理员角色必须保留管理端访问权限，不可取消</div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-btn secondary" id="roleCancelBtn">取消</button>
+      <button class="modal-btn primary" id="roleSaveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal" id="deleteModal">
+  <div class="modal-box" style="max-width:380px">
+    <div class="modal-head" id="deleteModalTitle">确认删除</div>
+    <div class="modal-body"><p id="deleteMsg" style="font-size:14px;color:var(--text);line-height:1.6"></p></div>
+    <div class="modal-foot">
+      <button class="modal-btn secondary" id="deleteCancelBtn">取消</button>
+      <button class="modal-btn danger" id="deleteConfirmBtn">删除</button>
+    </div>
+  </div>
+</div>
+
+<div class="notice" id="notice"></div>
+
+<script>
+(function(){
+var TOKEN=localStorage.getItem('fc_token')||'';
+// ---- Hard guard: no token at all -> bounce to login before any render ----
+if(!TOKEN){location.replace('/login.html');return;}
+var PERM_LABELS={import:'批量导入',entry:'录入',edit:'编辑',export:'导出',backup_settings:'备份设置',backup_query:'备份查询'};
+var PERM_CLASSES={import:'perm-import',entry:'perm-entry',edit:'perm-edit',export:'perm-export',backup_settings:'perm-backup-settings',backup_query:'perm-backup-query'};
+var rolesCache=[];
+var pendingDelete={type:'',id:'',msg:''};
+var IS_SUPER=false;   // 是否默认管理员账户（is_system），决定账户备份模块可见性
+
+function authHeaders(){return{'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json'}}
+function showNotice(msg,type){
+  var n=document.getElementById('notice');
+  n.textContent=msg;n.className='notice show '+(type||'ok');
+  setTimeout(function(){n.classList.remove('show')},3000);
+}
+function apiGet(url){return fetch(url,{headers:authHeaders()}).then(function(r){if(r.status===401){location.replace('/login.html');return Promise.reject('unauthorized')}return r.json()})}
+function apiPost(url,body){return fetch(url,{method:'POST',headers:authHeaders(),body:JSON.stringify(body||{})}).then(function(r){if(r.status===401){location.replace('/login.html');return Promise.reject('unauthorized')}return r.json()})}
+
+// ---- Session check ----
+function checkSession(){
+  return fetch('/api/auth/session',{headers:{'Authorization':'Bearer '+TOKEN}}).then(function(r){return r.json()}).then(function(d){
+    if(!d||!d.user||!d.user.is_admin){location.replace('/login.html');return false}
+    IS_SUPER=!!(d.user&&d.user.is_system);
+    return true;
+  }).catch(function(){location.replace('/login.html');return false});
+}
+
+// ---- Load data ----
+function loadUsers(){
+  apiGet('/api/admin/users').then(function(d){
+    if(d.error){showNotice(d.error,'error');return}
+    var body=document.getElementById('usersBody');
+    if(!d.users||!d.users.length){body.innerHTML='<tr><td colspan="5" class="empty">暂无用户</td></tr>';return}
+    body.innerHTML=d.users.map(function(u){
+      var sysTag=u.is_system?' <span class="perm-badge perm-admin">系统</span>':'';
+      var inactiveTag=!u.is_active?' <span class="perm-badge perm-inactive">已失活</span>':'';
+      var editBtn=u.is_active
+        ? '<button class="action-btn action-edit" data-uid="'+u.id+'">编辑</button>'
+        : '<button class="action-btn action-edit" disabled title="失活账户不允许编辑">编辑</button>';
+      var deactBtn;
+      if(u.is_system){
+        deactBtn='<button class="action-btn action-deactivate" disabled title="默认管理员账户不可失活">失活</button>';
+      }else if(!u.is_active){
+        deactBtn='<button class="action-btn action-activate" data-uid="'+u.id+'" data-uname="'+esc(u.username)+'" data-action="activate">激活</button>';
+      }else{
+        deactBtn='<button class="action-btn action-deactivate" data-uid="'+u.id+'" data-uname="'+esc(u.username)+'" data-action="deactivate">失活</button>';
+      }
+      return '<tr><td><strong>'+esc(u.username)+'</strong>'+sysTag+inactiveTag+'</td><td>'+esc(u.role_name)+'</td><td>'+esc(u.email||'—')+'</td><td>'+esc(u.department||'—')+'</td><td class="actions">'+editBtn+deactBtn+'</td></tr>';
+    }).join('');
+  });
+}
+
+function loadRoles(){
+  apiGet('/api/admin/roles').then(function(d){
+    if(d.error){showNotice(d.error,'error');return}
+    rolesCache=d.roles||[];
+    if(d.permissionLabels)PERM_LABELS=d.permissionLabels;
+    var body=document.getElementById('rolesBody');
+    if(!rolesCache.length){body.innerHTML='<tr><td colspan="3" class="empty">暂无角色</td></tr>';return}
+    body.innerHTML=rolesCache.map(function(r){
+      var perms=(r.permissions||[]).map(function(p){return '<span class="perm-badge '+(PERM_CLASSES[p]||'')+'">'+(PERM_LABELS[p]||p)+'</span>'}).join('');
+      if(r.is_admin)perms+='<span class="perm-badge perm-admin">管理员</span>';
+      var sysTag=r.is_system?' <span class="perm-badge perm-admin">系统</span>':'';
+      var delBtn=r.is_system
+        ? '<button class="action-btn action-del" disabled title="默认管理员角色不可删除">删除</button>'
+        : '<button class="action-btn action-del" data-rid="'+r.id+'" data-rname="'+esc(r.name)+'">删除</button>';
+      return '<tr><td><strong>'+esc(r.name)+'</strong>'+sysTag+'</td><td>'+perms+'</td><td class="actions"><button class="action-btn action-edit" data-rid="'+r.id+'">编辑</button>'+delBtn+'</td></tr>';
+    }).join('');
+  });
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ---- Tabs ----
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+    tab.classList.add('active');
+    var target=tab.dataset.tab;
+    document.getElementById('usersPanel').style.display=target==='users'?'block':'none';
+    document.getElementById('rolesPanel').style.display=target==='roles'?'block':'none';
+    document.getElementById('authBackupPanel').style.display=target==='auth'?'block':'none';
+    if(target==='auth')loadAuthBackups();
+  });
+});
+
+// ---- Account backup (仅默认管理员可见) ----
+var pendingAuthRestoreId='';
+
+function loadAuthBackups(){
+  apiGet('/api/auth-backups').then(function(d){
+    if(d.error){showNotice(d.error,'error');return}
+    var status=d.status||{};
+    var s='当前账户库：用户 '+(status.userCount||0)+' 个，角色 '+(status.roleCount||0)+' 个';
+    if(status.mtime)s+='，最后修改 '+status.mtime;
+    if(status.systemAdminExists===false)s+='（警告：默认管理员账户缺失）';
+    document.getElementById('authStatus').textContent=s;
+    var body=document.getElementById('authBackupsBody');
+    var items=d.items||[];
+    if(!items.length){body.innerHTML='<tr><td colspan="6" class="empty">暂无账户备份，建议点击右上角“立即备份”创建第一份快照</td></tr>';return}
+    body.innerHTML=items.map(function(b){
+      var size=b.sizeBytes||0;
+      var sizeStr=size>=1048576?(size/1048576).toFixed(2)+' MB':size>=1024?(size/1024).toFixed(1)+' KB':size+' B';
+      var labelMap={init:'初始快照',auto:'自动(账户变更)',manual:'手动'};
+      var lbl=labelMap[b.label]||b.label;
+      return '<tr><td>'+esc(b.createdAt)+'</td><td>'+esc(lbl)+'</td><td>'+(b.userCount||0)+'</td><td>'+(b.roleCount||0)+'</td><td>'+sizeStr+'</td><td class="actions"><button class="action-btn action-edit" data-restore="'+esc(b.id)+'">还原</button><button class="action-btn action-del" data-del="'+esc(b.id)+'">删除</button></td></tr>';
+    }).join('');
+  });
+}
+
+document.getElementById('authBackupBtn').addEventListener('click',function(){
+  var btn=this;btn.disabled=true;
+  apiPost('/api/auth-backups',{}).then(function(d){
+    btn.disabled=false;
+    if(d.error){showNotice(d.error,'error');return}
+    showNotice('账户备份已创建','ok');loadAuthBackups();
+  }).catch(function(){btn.disabled=false;});
+});
+
+document.getElementById('authBackupsBody').addEventListener('click',function(e){
+  var t=e.target;
+  if(t.dataset.restore){
+    pendingAuthRestoreId=t.dataset.restore;
+    document.getElementById('authRestoreTarget').textContent='目标快照：'+t.dataset.restore;
+    document.getElementById('authRestoreModal').classList.add('show');
+  }else if(t.dataset.del){
+    if(confirm('确定删除该账户备份快照吗？删除后移入回收站，可在回收站恢复。')){
+      apiPost('/api/auth-backups/delete',{id:t.dataset.del}).then(function(d){
+        if(d.error){showNotice(d.error,'error');return}
+        showNotice('备份已删除','ok');loadAuthBackups();
+      });
+    }
+  }
+});
+
+document.getElementById('authRestoreCancelBtn').addEventListener('click',function(){
+  document.getElementById('authRestoreModal').classList.remove('show');pendingAuthRestoreId='';
+});
+
+document.getElementById('authRestoreConfirmBtn').addEventListener('click',function(){
+  if(!pendingAuthRestoreId)return;
+  var id=pendingAuthRestoreId;pendingAuthRestoreId='';
+  document.getElementById('authRestoreModal').classList.remove('show');
+  apiPost('/api/auth-backups/restore',{id:id}).then(function(d){
+    if(d.error){showNotice(d.error,'error');return}
+    try{localStorage.removeItem('fc_token');localStorage.removeItem('fc_user');}catch(e){}
+    showNotice('账户数据库已还原，请重新登录','ok');
+    setTimeout(function(){location.href='/login.html';},1200);
+  });
+});
+
+// ---- User modal ----
+function openUserModal(user){
+  var modal=document.getElementById('userModal');
+  var select=document.getElementById('userRole');
+  select.innerHTML=rolesCache.map(function(r){return '<option value="'+r.id+'">'+esc(r.name)+(r.is_admin?' (管理员)':'')+'</option>'}).join('');
+  if(user){
+    document.getElementById('userModalTitle').textContent='编辑用户';
+    document.getElementById('userEditId').value=user.id;
+    document.getElementById('userUsername').value=user.username;
+    document.getElementById('userPassword').value='';
+    document.getElementById('userPassword').placeholder='留空表示不修改密码';
+    document.getElementById('userRole').value=user.role_id;
+    document.getElementById('userEmail').value=user.email||'';
+    document.getElementById('userDepartment').value=user.department||'';
+    var isSys=!!user.is_system;
+    var isInactive=!user.is_active;
+    select.disabled=isSys;
+    document.getElementById('userRoleNote').style.display=isSys?'block':'none';
+    var uNameEl=document.getElementById('userUsername');
+    uNameEl.disabled=isSys;
+    uNameEl.title=isSys?'默认管理员账户的用户名不可修改':'';
+    document.getElementById('userSaveBtn').disabled=isInactive;
+    document.getElementById('userSaveBtn').title=isInactive?'失活账户不允许编辑':'';
+  }else{
+    select.disabled=false;
+    document.getElementById('userRoleNote').style.display='none';
+    document.getElementById('userModalTitle').textContent='新增用户';
+    document.getElementById('userEditId').value='';
+    document.getElementById('userUsername').value='';
+    document.getElementById('userUsername').disabled=false;
+    document.getElementById('userUsername').title='';
+    document.getElementById('userPassword').value='';
+    document.getElementById('userPassword').placeholder='请输入密码';
+    document.getElementById('userRole').selectedIndex=0;
+    document.getElementById('userEmail').value='';
+    document.getElementById('userDepartment').value='';
+    document.getElementById('userSaveBtn').disabled=false;
+    document.getElementById('userSaveBtn').title='';
+  }
+  modal.classList.add('show');
+}
+function closeUserModal(){document.getElementById('userModal').classList.remove('show')}
+
+document.getElementById('addUserBtn').addEventListener('click',function(){
+  if(!rolesCache.length){showNotice('请先创建角色','error');return}
+  openUserModal(null);
+});
+document.getElementById('userCancelBtn').addEventListener('click',closeUserModal);
+document.getElementById('userSaveBtn').addEventListener('click',function(){
+  var payload={
+    id:document.getElementById('userEditId').value||undefined,
+    username:document.getElementById('userUsername').value.trim(),
+    password:document.getElementById('userPassword').value.trim(),
+    role_id:document.getElementById('userRole').value,
+    email:document.getElementById('userEmail').value.trim(),
+    department:document.getElementById('userDepartment').value.trim()
+  };
+  if(!payload.username){showNotice('请输入用户名','error');return}
+  if(!payload.id&&!payload.password){showNotice('请输入密码','error');return}
+  apiPost('/api/admin/users',payload).then(function(d){
+    if(d.error){showNotice(d.error,'error');return}
+    closeUserModal();
+    showNotice('用户保存成功','ok');
+    loadUsers();
+  });
+});
+
+// ---- Role modal ----
+function openRoleModal(role){
+  var container=document.getElementById('permChecks');
+  container.innerHTML=['import','entry','edit','export','backup_settings','backup_query'].map(function(p){
+    var checked=role&&role.permissions&&role.permissions.indexOf(p)>=0?'checked':'';
+    return '<label class="perm-check '+(checked?'checked':'')+'"><input type="checkbox" value="'+p+'" '+checked+'> '+PERM_LABELS[p]+'</label>';
+  }).join('');
+  container.querySelectorAll('.perm-check input').forEach(function(cb){
+    cb.addEventListener('change',function(){cb.parentElement.classList.toggle('checked',cb.checked)});
+  });
+  if(role){
+    document.getElementById('roleModalTitle').textContent='编辑角色';
+    document.getElementById('roleEditId').value=role.id;
+    document.getElementById('roleName').value=role.name;
+    document.getElementById('roleIsAdmin').checked=!!role.is_admin;
+    var isSys=!!role.is_system;
+    document.getElementById('roleIsAdmin').disabled=isSys;
+    document.getElementById('roleAdminNote').style.display=isSys?'block':'none';
+  }else{
+    document.getElementById('roleModalTitle').textContent='新增角色';
+    document.getElementById('roleEditId').value='';
+    document.getElementById('roleName').value='';
+    document.getElementById('roleIsAdmin').checked=false;
+    document.getElementById('roleIsAdmin').disabled=false;
+    document.getElementById('roleAdminNote').style.display='none';
+  }
+  document.getElementById('roleModal').classList.add('show');
+}
+function closeRoleModal(){document.getElementById('roleModal').classList.remove('show')}
+
+document.getElementById('addRoleBtn').addEventListener('click',function(){openRoleModal(null)});
+document.getElementById('roleCancelBtn').addEventListener('click',closeRoleModal);
+document.getElementById('roleSaveBtn').addEventListener('click',function(){
+  var permissions=[];
+  document.querySelectorAll('#permChecks input:checked').forEach(function(cb){permissions.push(cb.value)});
+  var payload={
+    id:document.getElementById('roleEditId').value||undefined,
+    name:document.getElementById('roleName').value.trim(),
+    permissions:permissions,
+    is_admin:document.getElementById('roleIsAdmin').checked
+  };
+  if(!payload.name){showNotice('请输入角色名称','error');return}
+  apiPost('/api/admin/roles',payload).then(function(d){
+    if(d.error){showNotice(d.error,'error');return}
+    closeRoleModal();
+    showNotice('角色保存成功','ok');
+    loadRoles();
+  });
+});
+
+// ---- Edit/Delete delegation ----
+document.getElementById('usersBody').addEventListener('click',function(e){
+  var btn=e.target.closest('.action-edit,.action-deactivate,.action-activate');
+  if(!btn)return;
+  if(btn.classList.contains('action-edit')){
+    apiGet('/api/admin/users').then(function(d){
+      var user=d.users.find(function(u){return u.id===btn.dataset.uid});
+      if(user)openUserModal(user);
+    });
+  }else if(btn.dataset.action==='activate'){
+    pendingDelete={type:'user_activate',id:btn.dataset.uid,msg:'确定激活用户「'+btn.dataset.uname+'」吗？激活后该用户可正常登录。'};
+    document.getElementById('deleteModalTitle').textContent='激活账户';
+    document.getElementById('deleteConfirmBtn').textContent='激活';
+    document.getElementById('deleteConfirmBtn').className='modal-btn primary';
+    document.getElementById('deleteMsg').textContent=pendingDelete.msg;
+    document.getElementById('deleteModal').classList.add('show');
+  }else{
+    pendingDelete={type:'user_deactivate',id:btn.dataset.uid,msg:'确定将用户「'+btn.dataset.uname+'」设为失活吗？失活后该用户将无法登录，且不可编辑。'};
+    document.getElementById('deleteModalTitle').textContent='设为失活';
+    document.getElementById('deleteConfirmBtn').textContent='失活';
+    document.getElementById('deleteConfirmBtn').className='modal-btn danger';
+    document.getElementById('deleteMsg').textContent=pendingDelete.msg;
+    document.getElementById('deleteModal').classList.add('show');
+  }
+});
+document.getElementById('rolesBody').addEventListener('click',function(e){
+  var btn=e.target.closest('.action-edit,.action-del');
+  if(!btn)return;
+  if(btn.classList.contains('action-edit')){
+    var role=rolesCache.find(function(r){return r.id===btn.dataset.rid});
+    if(role)openRoleModal(role);
+  }else{
+    pendingDelete={type:'role',id:btn.dataset.rid,msg:'确定删除角色「'+btn.dataset.rname+'」吗？'};
+    document.getElementById('deleteModalTitle').textContent='确认删除';
+    document.getElementById('deleteConfirmBtn').textContent='删除';
+    document.getElementById('deleteMsg').textContent=pendingDelete.msg;
+    document.getElementById('deleteModal').classList.add('show');
+  }
+});
+
+// ---- Delete confirm ----
+document.getElementById('deleteCancelBtn').addEventListener('click',function(){
+  document.getElementById('deleteModal').classList.remove('show');
+  pendingDelete={type:'',id:'',msg:''};
+});
+document.getElementById('deleteConfirmBtn').addEventListener('click',function(){
+  if(pendingDelete.type==='user_deactivate'){
+    apiPost('/api/admin/users/deactivate',{id:pendingDelete.id}).then(function(d){
+      document.getElementById('deleteModal').classList.remove('show');
+      if(d.error){showNotice(d.error,'error');return}
+      showNotice('用户已失活','ok');
+      loadUsers();
+      pendingDelete={type:'',id:'',msg:''};
+    });
+    return;
+  }
+  if(pendingDelete.type==='user_activate'){
+    apiPost('/api/admin/users/activate',{id:pendingDelete.id}).then(function(d){
+      document.getElementById('deleteModal').classList.remove('show');
+      if(d.error){showNotice(d.error,'error');return}
+      showNotice('用户已激活','ok');
+      loadUsers();
+      pendingDelete={type:'',id:'',msg:''};
+    });
+    return;
+  }
+  var url=pendingDelete.type==='role'?'/api/admin/roles/delete':'/api/admin/roles/delete';
+  document.getElementById('deleteConfirmBtn').className='modal-btn danger';
+  apiPost(url,{id:pendingDelete.id}).then(function(d){
+    document.getElementById('deleteModal').classList.remove('show');
+    if(d.error){showNotice(d.error,'error');return}
+    showNotice('删除成功','ok');
+    if(pendingDelete.type==='role')loadRoles();
+    pendingDelete={type:'',id:'',msg:''};
+  });
+});
+
+// ---- Close modal on backdrop click ----
+document.querySelectorAll('.modal').forEach(function(m){
+  m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('show')});
+});
+
+// ---- Logout ----
+document.getElementById('logoutBtn').addEventListener('click',async function(){
+  try{await fetch('/api/auth/logout',{method:'POST',headers:{'Authorization':'Bearer '+TOKEN}})}catch(e){}
+  localStorage.removeItem('fc_token');
+  localStorage.removeItem('fc_user');
+  location.href='/login.html';
+});
+
+// ---- Init ----
+checkSession().then(function(ok){
+  if(!ok)return;
+  if(IS_SUPER){
+    document.getElementById('authTab').style.display='';
+    loadAuthBackups();
+  }
+  loadRoles();
+  loadUsers();
+});
+})();
+</script>
+</body>
+</html>

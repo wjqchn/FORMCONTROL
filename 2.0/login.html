@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>质量文控平台 · 登录</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f7fa;--text:#3a4a59}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 90% 0,#252258 0,#090d1a 44%),var(--bg);color:var(--text);font-family:Rockwell,"Microsoft YaHei","PingFang SC",sans-serif;padding:24px}
+
+.login-card{position:relative;width:100%;max-width:420px;padding:40px 36px 32px;border:1px solid rgba(146,184,206,.55);border-radius:15px;overflow:hidden;background:radial-gradient(560px 300px at 92% -34%,rgba(255,176,102,.26),transparent 60%),radial-gradient(640px 340px at 4% 142%,rgba(92,148,255,.24),transparent 60%),radial-gradient(470px 270px at 66% 166%,rgba(255,119,162,.20),transparent 62%),radial-gradient(380px 230px at 26% -44%,rgba(90,222,198,.24),transparent 60%),linear-gradient(112deg,#d6f4ec 0%,#e3efff 26%,#ece6ff 50%,#ffe7f0 74%,#fff1d6 100%);box-shadow:0 18px 44px rgba(53,87,105,.16)}
+.login-card:before{content:"";position:absolute;right:-82px;top:-145px;width:390px;height:390px;border:1px solid #7fd6c7;border-radius:50%;opacity:.55;background:radial-gradient(circle at 50% 50%,rgba(127,214,199,.16),transparent 70%);pointer-events:none}
+.login-card:after{content:"";position:absolute;right:88px;bottom:-128px;width:260px;height:260px;border:1px solid #e0a9d8;border-radius:50%;opacity:.6;background:radial-gradient(circle at 50% 50%,rgba(224,169,216,.18),transparent 70%);pointer-events:none}
+
+.login-brand{position:relative;z-index:1;display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.login-brand-icon{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#1aa891,#5f75e8);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(26,168,145,.3)}
+.login-brand-text h1{font-size:19px;font-weight:700;color:#1c3447;letter-spacing:.5px}
+.login-brand-text p{font-size:12px;color:#5a7a8a;margin-top:2px}
+
+.login-form{position:relative;z-index:1}
+.field-group{margin-bottom:20px}
+.field-label{display:block;font-size:13px;font-weight:600;color:#3b5364;margin-bottom:7px}
+.field-input{width:100%;height:42px;padding:0 14px;border:1.5px solid #cfdbe4;border-radius:9px;font-size:14px;font-family:inherit;color:#3a4a59;background:#fff;transition:border-color .2s,box-shadow .2s}
+.field-input:focus{outline:none;border-color:#5f75e8;box-shadow:0 0 0 3px rgba(95,117,232,.12)}
+.field-input::placeholder{color:#aab8c4}
+
+.login-btn{width:100%;height:44px;border:none;border-radius:10px;font-size:14px;font-weight:600;font-family:inherit;color:#fff;cursor:pointer;background:linear-gradient(135deg,#6d83ed,#5368dc);box-shadow:0 4px 14px rgba(109,131,237,.3);transition:transform .15s}
+.login-btn:active{transform:scale(.98)}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
+
+.login-error{min-height:20px;font-size:12px;color:#e74c3c;margin-bottom:12px;text-align:center;opacity:0;transition:opacity .2s}
+.login-error.show{opacity:1}
+
+
+.loading-overlay{position:fixed;inset:0;background:rgba(9,13,26,.5);display:flex;align-items:center;justify-content:center;z-index:999;opacity:0;pointer-events:none;transition:opacity .2s}
+.loading-overlay.show{opacity:1;pointer-events:auto}
+.loading-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#5f75e8;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 首次登录/首次部署密码设置 */
+.force-modal,.setup-modal{position:fixed;inset:0;background:rgba(9,13,26,.62);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
+.setup-modal.show,.force-modal.show{display:flex}
+.force-modal.show{display:flex}
+.force-card{position:relative;width:100%;max-width:420px;padding:34px 36px 30px;border:1px solid rgba(146,184,206,.55);border-radius:15px;overflow:hidden;background:radial-gradient(560px 300px at 92% -34%,rgba(255,176,102,.26),transparent 60%),radial-gradient(640px 340px at 4% 142%,rgba(92,148,255,.24),transparent 60%),radial-gradient(470px 270px at 66% 166%,rgba(255,119,162,.20),transparent 62%),radial-gradient(380px 230px at 26% -44%,rgba(90,222,198,.24),transparent 60%),linear-gradient(112deg,#d6f4ec 0%,#e3efff 26%,#ece6ff 50%,#ffe7f0 74%,#fff1d6 100%);box-shadow:0 18px 44px rgba(53,87,105,.16)}
+.force-title{position:relative;z-index:1;font-size:18px;font-weight:700;color:#1c3447;margin-bottom:6px}
+.force-sub{position:relative;z-index:1;font-size:12px;color:#5a7a8a;margin-bottom:22px;line-height:1.5}
+.setup-account{display:flex;align-items:center;gap:12px;min-height:48px;padding:4px 0 7px;border-bottom:1px solid rgba(124,151,174,.32)}
+.setup-account-bar{width:4px;align-self:stretch;border-radius:3px;background:linear-gradient(180deg,#1aa891,#5f75e8)}
+.setup-account-name{display:flex;align-items:center;gap:8px;color:#203d51;font-size:20px;font-weight:600;line-height:1;letter-spacing:.4px}
+.setup-account-name .user-dot{width:8px;height:8px;border-radius:50%;background:#1aa891;box-shadow:0 0 0 4px rgba(26,168,145,.12)}
+.password-wrap{position:relative}.password-wrap .field-input{padding-right:42px}.password-eye{position:absolute;right:8px;top:6px;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:#70879a;cursor:pointer;font-size:14px}.password-eye:hover{background:rgba(95,117,232,.1);color:#5a70dc}
+.password-strength{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:11px;color:#7b91a0}.strength-bars{display:flex;gap:3px}.strength-bars i{display:block;width:18px;height:3px;border-radius:4px;background:#d8e2e9}.strength-bars i.on{background:#1aa891}.strength-tip{margin-top:6px;font-size:11px;color:#7b91a0;line-height:1.5}.strength-text.safe{color:#1aa891}.strength-text.high{color:#5f75e8}.strength-text.medium{color:#b47a18}.strength-text.low{color:#bd5962}
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="login-brand">
+    <div class="login-brand-icon">Q</div>
+    <div class="login-brand-text">
+      <h1>质量文控平台</h1>
+      <p>表格分类汇总系统 2.0</p>
+    </div>
+  </div>
+
+  <form class="login-form" id="loginForm" onsubmit="return false">
+    <div class="field-group">
+      <label class="field-label" for="username">用户名</label>
+      <input class="field-input" type="text" id="username" autocomplete="username" autofocus>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="password">密码</label>
+      <input class="field-input" type="password" id="password" autocomplete="current-password">
+    </div>
+    <div class="login-error" id="error"></div>
+    <button class="login-btn" type="submit" id="loginBtn">登 录</button>
+  </form>
+</div>
+
+<div class="loading-overlay" id="loading">
+  <div class="loading-spinner"></div>
+</div>
+
+<div class="setup-modal" id="setupModal">
+  <div class="force-card">
+    <div class="force-title">请设置管理员密码</div>
+    <div class="force-sub">系统首次启用。请为默认管理员设置一个仅由您本人掌握的登录密码。</div>
+    <form class="login-form" id="setupForm" onsubmit="return false">
+      <div class="field-group">
+        <div class="field-label"><span>默认管理员用户名</span><span style="float:right;font-size:11px;font-weight:400;color:#8196a4">系统预置，不可修改</span></div>
+        <div class="setup-account"><span class="setup-account-bar"></span><div class="setup-account-name"><i class="user-dot"></i>admin</div></div>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="setupNewPw">设置新密码 <span style="float:right;font-size:11px;font-weight:400;color:#8196a4">至少 8 位</span></label>
+        <div class="password-wrap"><input class="field-input" type="password" id="setupNewPw" autocomplete="new-password" placeholder="请输入管理员新密码"><button class="password-eye" type="button" data-password-target="setupNewPw" aria-label="显示或隐藏密码">◉</button></div>
+        <div class="password-strength"><span>密码强度</span><div class="strength-bars" id="setupStrengthBars"><i></i><i></i><i></i><i></i></div><span class="strength-text low" id="setupStrengthText">低</span></div>
+        <div class="strength-tip" id="setupStrengthTip">至少 8 位，并包含四类字符中的至少三类</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="setupNewPw2">确认密码</label>
+        <div class="password-wrap"><input class="field-input" type="password" id="setupNewPw2" autocomplete="new-password" placeholder="请再次输入管理员新密码"><button class="password-eye" type="button" data-password-target="setupNewPw2" aria-label="显示或隐藏密码">◉</button></div>
+      </div>
+      <div class="login-error" id="setupError"></div>
+      <button class="login-btn" type="submit" id="setupBtn" disabled>完成初始化</button>
+    </form>
+  </div>
+</div>
+
+<div class="force-modal" id="forceModal">
+  <div class="force-card">
+    <div class="force-title">请修改初始密码</div>
+    <div class="force-sub">为保障账户安全，首次登录必须修改密码后才能继续使用。</div>
+    <form class="login-form" id="forceForm" onsubmit="return false">
+      <div class="field-group">
+        <label class="field-label" for="oldPw">原密码</label>
+        <input class="field-input" type="password" id="oldPw" autocomplete="current-password">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="newPw">新密码</label>
+        <input class="field-input" type="password" id="newPw" autocomplete="new-password">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="newPw2">确认新密码</label>
+        <input class="field-input" type="password" id="newPw2" autocomplete="new-password">
+      </div>
+      <div class="login-error" id="forceError"></div>
+      <button class="login-btn" type="submit" id="forceBtn">确认修改</button>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  // 首次部署不复用任何历史令牌，直接进入“设置管理员密码”引导。
+  // 这样关闭网页后，下次只会重新显示设置引导，不会进入旧的改密会话。
+  var token = localStorage.getItem('fc_token');
+  fetch('/api/auth/bootstrap').then(function(r){return r.json()}).then(function(state){
+    if(state && state.initial_admin_password_required){
+      localStorage.removeItem('fc_token');
+      localStorage.removeItem('fc_user');
+      showSetupAdmin();
+      return;
+    }
+    // 已登录则直接跳转主页；普通用户首次改密只使用内存令牌
+    if(token){
+      fetch('/api/auth/session',{headers:{'Authorization':'Bearer '+token}})
+        .then(function(r){return r.json()})
+        .then(function(d){
+          if(d && d.user && !d.user.must_change_pw){
+            location.href = '/表格分类汇总.html';
+          } else {
+            localStorage.removeItem('fc_token');
+            localStorage.removeItem('fc_user');
+          }
+        }).catch(function(){
+          localStorage.removeItem('fc_token');
+          localStorage.removeItem('fc_user');
+        });
+    }
+  }).catch(function(){});
+
+  var btn = document.getElementById('loginBtn');
+  var errEl = document.getElementById('error');
+  var loading = document.getElementById('loading');
+
+  function showError(msg){
+    errEl.textContent = msg;
+    errEl.classList.add('show');
+  }
+  function clearError(){
+    errEl.classList.remove('show');
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    clearError();
+    var username = document.getElementById('username').value.trim();
+    var password = document.getElementById('password').value.trim();
+    if(!username || !password){
+      showError('请输入用户名和密码');
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = '登录中…';
+    loading.classList.add('show');
+
+    fetch('/api/auth/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:username, password:password})
+    }).then(function(r){return r.json()})
+      .then(function(d){
+        loading.classList.remove('show');
+        btn.disabled = false;
+        btn.textContent = '登 录';
+        if(d.error){
+          showError(d.error);
+          return;
+        }
+        if(d.setup_required){
+          showSetupAdmin();
+        } else if(d.token && d.user){
+          if(d.user.must_change_pw){
+            // 普通用户的强制改密令牌只在当前页面内使用，不落 localStorage。
+            showForceChange(d.token, d.user);
+          } else {
+            localStorage.setItem('fc_token', d.token);
+            localStorage.setItem('fc_user', JSON.stringify(d.user));
+            location.href = '/表格分类汇总.html';
+          }
+        } else {
+          showError('登录响应异常，请重试');
+        }
+      }).catch(function(){
+        loading.classList.remove('show');
+        btn.disabled = false;
+        btn.textContent = '登 录';
+        showError('网络错误，请检查服务是否正在运行');
+      });
+  });
+
+  document.getElementById('username').addEventListener('input', clearError);
+  document.getElementById('password').addEventListener('input', clearError);
+
+  // ---- 首次部署：设置默认管理员密码（不使用、也不持久化登录令牌） ----
+  var setupModal = document.getElementById('setupModal');
+  var setupErr = document.getElementById('setupError');
+  var setupBtn = document.getElementById('setupBtn');
+  var setupNewEl = document.getElementById('setupNewPw');
+  var setupNewEl2 = document.getElementById('setupNewPw2');
+  var setupStrengthBars = document.querySelectorAll('#setupStrengthBars i');
+  var setupStrengthText = document.getElementById('setupStrengthText');
+  var setupStrengthTip = document.getElementById('setupStrengthTip');
+  var allowedSpecial = /[!@#$%^&*()_+\-=\[\]{}|;:,.~]/;
+  function getPasswordStrength(value){
+    var groups=0;
+    if(/[A-Z]/.test(value)) groups++;
+    if(/[a-z]/.test(value)) groups++;
+    if(/[0-9]/.test(value)) groups++;
+    if(allowedSpecial.test(value)) groups++;
+    var missing=4-groups;
+    if(value.length<8 || missing>=3) return {level:'low',groups:groups};
+    if(missing===2) return {level:'medium',groups:groups};
+    if(missing===1) return {level:'high',groups:groups};
+    return {level:'safe',groups:groups};
+  }
+  function updateSetupStrength(){
+    var value=setupNewEl.value;
+    var result=getPasswordStrength(value);
+    var labels={low:'低',medium:'中',high:'高',safe:'安全'};
+    var colors={low:'#db6d73',medium:'#e3a43b',high:'#5f75e8',safe:'#1aa891'};
+    var count={low:1,medium:2,high:3,safe:4}[result.level];
+    setupStrengthBars.forEach(function(bar,index){
+      bar.classList.toggle('on',index<count);
+      bar.style.background=index<count?colors[result.level]:'#d8e2e9';
+    });
+    setupStrengthText.className='strength-text '+result.level;
+    setupStrengthText.textContent=labels[result.level];
+    setupStrengthTip.textContent=value.length<8?'至少 8 位，并包含四类字符中的至少三类':(result.groups>=3?'已满足至少三类字符组合要求':'还需补充 '+(3-result.groups)+' 类字符');
+    setupBtn.disabled=!(value.length>=8 && result.groups>=3 && setupNewEl2.value===value);
+  }
+  function showSetupError(msg){ setupErr.textContent = msg; setupErr.classList.add('show'); }
+  function clearSetupError(){ setupErr.classList.remove('show'); }
+  function showSetupAdmin(){
+    setupModal.classList.add('show');
+    setupNewEl.value = ''; setupNewEl2.value = '';
+    updateSetupStrength(); clearSetupError();
+    setTimeout(function(){ setupNewEl.focus(); }, 50);
+  }
+  document.getElementById('setupForm').addEventListener('submit', function(e){
+    e.preventDefault(); clearSetupError();
+    var newP = setupNewEl.value.trim();
+    var newP2 = setupNewEl2.value.trim();
+    var strength=getPasswordStrength(newP);
+    if(newP.length<8 || strength.groups<3){ showSetupError('密码至少 8 位，并需包含大写字母、小写字母、数字、特殊符号中的至少三类'); return; }
+    if(newP !== newP2){ showSetupError('两次输入的管理员新密码不一致'); return; }
+    setupBtn.disabled = true; setupBtn.textContent = '初始化中…';
+    fetch('/api/auth/setup-admin-password',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({new_password:newP})
+    }).then(function(r){return r.json()}).then(function(d){
+      setupBtn.disabled = false; setupBtn.textContent = '完成初始化';
+      if(d.error){ showSetupError(d.error); return; }
+      if(d.ok && d.token && d.user){
+        localStorage.setItem('fc_token', d.token);
+        localStorage.setItem('fc_user', JSON.stringify(d.user));
+        location.href = '/表格分类汇总.html';
+      } else { showSetupError('初始化失败，请重试'); }
+    }).catch(function(){
+      setupBtn.disabled = false; setupBtn.textContent = '完成初始化';
+      showSetupError('网络错误，请检查服务是否正在运行');
+    });
+  });
+  setupNewEl.addEventListener('input', function(){ clearSetupError(); updateSetupStrength(); });
+  setupNewEl2.addEventListener('input', function(){ clearSetupError(); updateSetupStrength(); });
+  document.querySelectorAll('[data-password-target]').forEach(function(button){
+    button.addEventListener('click', function(){
+      var input=document.getElementById(this.getAttribute('data-password-target'));
+      input.type=input.type==='password'?'text':'password';
+      input.focus();
+    });
+  });
+
+  // ---- 普通账户首次登录强制修改密码 ----
+  var forceModal = document.getElementById('forceModal');
+  var forceErr = document.getElementById('forceError');
+  var forceBtn = document.getElementById('forceBtn');
+  var oldEl = document.getElementById('oldPw');
+  var newEl = document.getElementById('newPw');
+  var newEl2 = document.getElementById('newPw2');
+  var forceToken = '';
+
+  function showForceError(msg){
+    forceErr.textContent = msg;
+    forceErr.classList.add('show');
+  }
+  function clearForceError(){
+    forceErr.classList.remove('show');
+  }
+  function showForceChange(tk, user){
+    forceToken = tk;
+    forceModal.classList.add('show');
+    oldEl.value = '';
+    newEl.value = '';
+    newEl2.value = '';
+    clearForceError();
+    setTimeout(function(){ oldEl.focus(); }, 50);
+  }
+
+  document.getElementById('forceForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    clearForceError();
+    var oldP = oldEl.value.trim();
+    var newP = newEl.value.trim();
+    var newP2 = newEl2.value.trim();
+    if(!oldP || !newP){
+      showForceError('请输入原密码和新密码');
+      return;
+    }
+    if(newP.length < 6){
+      showForceError('新密码至少 6 位');
+      return;
+    }
+    if(newP !== newP2){
+      showForceError('两次输入的新密码不一致');
+      return;
+    }
+    forceBtn.disabled = true;
+    forceBtn.textContent = '修改中…';
+    fetch('/api/auth/change-password',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+forceToken},
+      body:JSON.stringify({old_password:oldP, new_password:newP})
+    }).then(function(r){return r.json()})
+      .then(function(d){
+        forceBtn.disabled = false;
+        forceBtn.textContent = '确认修改';
+        if(d.error){
+          showForceError(d.error);
+          return;
+        }
+        if(d.ok && d.user){
+          localStorage.setItem('fc_user', JSON.stringify(d.user));
+          location.href = '/表格分类汇总.html';
+        } else {
+          showForceError('修改失败，请重试');
+        }
+      }).catch(function(){
+        forceBtn.disabled = false;
+        forceBtn.textContent = '确认修改';
+        showForceError('网络错误，请检查服务是否正在运行');
+      });
+  });
+
+  oldEl.addEventListener('input', clearForceError);
+  newEl.addEventListener('input', clearForceError);
+  newEl2.addEventListener('input', clearForceError);
+})();
+</script>
+
+</body>
+</html>
